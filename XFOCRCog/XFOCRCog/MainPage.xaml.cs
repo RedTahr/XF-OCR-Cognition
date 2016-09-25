@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.ProjectOxford.Vision;
+using Microsoft.ProjectOxford.Vision.Contract;
+using Plugin.Media;
+using Plugin.Media.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +13,45 @@ namespace XFOCRCog {
 	public partial class MainPage : ContentPage {
 		public MainPage() {
 			InitializeComponent();
+			capture.Clicked += Capture_Clicked;
+		}
+
+		private async void Capture_Clicked(object sender, EventArgs e) {
+			await CrossMedia.Current.Initialize();
+
+			MediaFile photo;
+			if (CrossMedia.Current.IsCameraAvailable) {
+				photo = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions {
+					Directory = "bcard",
+					Name = "bcard.jpg"
+				});
+			}
+			else {
+				photo = await CrossMedia.Current.PickPhotoAsync();
+			}
+
+			if (photo == null) return;
+
+			OcrResults text;
+			System.Diagnostics.Debug.WriteLine("clog@" + DateTime.Now.ToString("mm:ss.fff") + "	:	about to OCR");
+			var client = new VisionServiceClient(""); // cognitive api key - https://www.microsoft.com/cognitive-services/en-US/subscriptions
+			using (var photoStream = photo.GetStream()) {
+				text = await client.RecognizeTextAsync(photoStream);
+			}
+
+			System.Diagnostics.Debug.WriteLine("clog@" + DateTime.Now.ToString("mm:ss.fff") + "	:	done OCRing");
+			var builder = new StringBuilder();
+
+			foreach (var region in text.Regions) {
+				foreach (var line in region.Lines) {
+					foreach (var word in line.Words) {
+						builder.Append(word.Text + " ");
+					}
+					builder.AppendLine();
+				}
+			}
+
+			label.Text = builder.ToString();
 		}
 	}
 }
