@@ -42,13 +42,19 @@ namespace XFOCRCog {
 			System.Diagnostics.Debug.WriteLine("clog@" + DateTime.Now.ToString("mm:ss.fff") + "	:	done OCRing");
 			var builder = new StringBuilder();
 
+			var rcount = 0;
+			var lcount = 0;
 			foreach (var region in text.Regions) {
+				builder.AppendLine($"region {rcount}");
 				foreach (var line in region.Lines) {
+					builder.AppendLine($"line {lcount}");
 					foreach (var word in line.Words) {
 						builder.Append(word.Text + " ");
 					}
 					builder.AppendLine();
+					lcount++;
 				}
+				rcount++;
 			}
 
 			label.Text = builder.ToString();

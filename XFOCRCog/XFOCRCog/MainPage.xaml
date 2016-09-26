@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:XFOCRCog"
              x:Class="XFOCRCog.MainPage">
+  <ScrollView>
   <StackLayout>
   <Label x:Name="label" Text="Welcome to Xamarin Forms!"
            VerticalOptions="Start"
@@ -10,4 +11,5 @@
 
   <Button x:Name="capture" Text="Capture" />
 </StackLayout>
+  </ScrollView>
 </ContentPage>
